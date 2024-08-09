@@ -4,7 +4,15 @@ import { Context, Hono } from "hono"
 import { sign } from "hono/jwt"
 import zod from "zod"
 
-const user = new Hono()
+const user = new Hono<{
+
+  Variables:{
+    userId : string
+  },
+  Bindings:{
+    DATABASE_URL:string
+  }  
+}>()
 
 const signupInput = zod.object({
   email: zod.string().email(),
@@ -19,12 +27,41 @@ const signinInput = zod.object({
 
 
 export const me = async(c : Context) => {
-    return c.html('<h1>Profile</h1>')
+
+  const prisma : PrismaClient= c.get('prisma')
+  const userId : string = c.get("userId")
+
+  // console.log("userid",userId);
+
+  try {
+
+    const user = await prisma.user.findFirst({
+      where :{
+         id: userId
+
+      },
+      select:{
+        email:true,
+        name:true
+      }
+    })
+
+
+    return c.json({data:user},200)
+    
+  } catch (error) {
+    
+    console.log(error);
+    
+    return c.json({success:false,message:"Error while fetching user profile"},500) 
+  }
+
+
 }
 
 
 export const signup = async(c : Context) => {
-  
+    
     const body = await c.req.json()
   
     const {success} = signupInput.safeParse(body)
@@ -50,11 +87,10 @@ export const signup = async(c : Context) => {
           password: body.password
         }
       })
-      console.log('D');
+
     
-      const token = await sign({id:user.id},c.env.JWT_SECRET)
+      const token = await sign({userId:user.id},c.env.JWT_SECRET)
       
-     console.log('e');
 
       return c.json({
         jwt:token
@@ -70,7 +106,7 @@ export const signup = async(c : Context) => {
 }
 
 export const signin = async(c : Context) => {
-  
+
   const body = await c.req.json();
   const {success} = signinInput.safeParse(body)
 
@@ -86,7 +122,7 @@ export const signin = async(c : Context) => {
     const user = await prisma.user.findUnique({
             where: {
                 email: body.email,
-          password: body.password
+                password: body.password
             }
         });
     
@@ -95,7 +131,7 @@ export const signin = async(c : Context) => {
             return c.json({ error: "user not found" });
         }
     
-        const jwt = await sign({ id: user.id }, c.env.JWT_SECRET);
+        const jwt = await sign({ userId: user.id }, c.env.JWT_SECRET);
         return c.json({ jwt }); 
   } catch (error) {
     console.log(error);
