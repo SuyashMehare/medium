@@ -3,8 +3,8 @@ import { getAllBlogs, getBlogById, updateBlog, uploadBlog } from "../controllers
 import { createMiddleware } from "hono/factory";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
-
-const blogGroup = new Hono();
+import { Bindings } from "../utils/types";
+const blogGroup = new Hono<{Bindings:Bindings}>();
 
 blogGroup.use(createMiddleware(async (c,next) => {
     const prisma = new PrismaClient({
@@ -18,7 +18,7 @@ blogGroup.use(createMiddleware(async (c,next) => {
 
 blogGroup
     .post('/',uploadBlog)
-    .put('/:blogId',updateBlog)
+    .patch('/:blogId',updateBlog)
     .get('/bulk',getAllBlogs)
     .get('/:blogId',getBlogById)
 

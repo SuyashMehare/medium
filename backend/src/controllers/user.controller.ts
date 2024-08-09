@@ -1,18 +1,7 @@
 import { PrismaClient } from "@prisma/client/edge"
-import { withAccelerate } from "@prisma/extension-accelerate"
 import { Context, Hono } from "hono"
 import { sign } from "hono/jwt"
 import zod from "zod"
-
-const user = new Hono<{
-
-  Variables:{
-    userId : string
-  },
-  Bindings:{
-    DATABASE_URL:string
-  }  
-}>()
 
 const signupInput = zod.object({
   email: zod.string().email(),
@@ -72,10 +61,7 @@ export const signup = async(c : Context) => {
     }
 
     
-    const prisma = new PrismaClient({
-      datasourceUrl: c.env?.DATABASE_URL,
-    }).$extends(withAccelerate())
-  
+    const prisma : PrismaClient = c.get("prisma")
   
   
     try {
@@ -114,9 +100,7 @@ export const signin = async(c : Context) => {
     return c.json({message:"Invalid inputs"})
   }  
 
-    const prisma = new PrismaClient({
-        datasourceUrl: c.env?.DATABASE_URL,
-    }).$extends(withAccelerate());
+  const prisma : PrismaClient = c.get("prisma")
 
     try {
     const user = await prisma.user.findUnique({

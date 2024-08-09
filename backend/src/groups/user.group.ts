@@ -3,8 +3,14 @@ import { me, signin, signup } from "../controllers/user.controller";
 import { createMiddleware } from "hono/factory";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
+import { Bindings } from "../utils/types";
 
-const userGroup= new Hono()
+const userGroup= new Hono<{
+    Bindings:Bindings
+    Variables:{
+        prisma : string
+    }
+}>();
 
 
 userGroup.use(createMiddleware(async (c,next) => {
