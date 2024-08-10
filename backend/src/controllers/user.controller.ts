@@ -1,18 +1,7 @@
 import { PrismaClient } from "@prisma/client/edge"
+import { SignInInputZodShema, SignUpInputZodShema } from "medium-request-validator";
 import { Context, Hono } from "hono"
 import { sign } from "hono/jwt"
-import zod from "zod"
-
-const signupInput = zod.object({
-  email: zod.string().email(),
-  name: zod.string(),
-  password: zod.string()
-})
-
-const signinInput = zod.object({
-  email: zod.string().email(),
-  password: zod.string()
-})
 
 
 export const me = async(c : Context) => {
@@ -52,9 +41,8 @@ export const me = async(c : Context) => {
 export const signup = async(c : Context) => {
     
     const body = await c.req.json()
-  
-    const {success} = signupInput.safeParse(body)
 
+    const { success } = SignUpInputZodShema.safeParse(body)
 
     if (!success) {
       return c.json({message:"Invalid input"})
@@ -94,7 +82,7 @@ export const signup = async(c : Context) => {
 export const signin = async(c : Context) => {
 
   const body = await c.req.json();
-  const {success} = signinInput.safeParse(body)
+  const { success } = SignInInputZodShema.safeParse(body)
 
   if (!success) {
     return c.json({message:"Invalid inputs"})

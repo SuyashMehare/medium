@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client/edge";
+import { UpdatePostZodShema, CreatePostZodShema , UpdatePostType, CratePostType} from "medium-request-validator";
 import { Context } from "hono";
 
 export const getAllBlogs = async (c : Context) => {
@@ -74,20 +75,18 @@ export const getBlogById = async (c : Context) => {
 }
 
 
-interface UploadPost {
-    title: string,
-    content: string,
-    published ? : boolean
-}
-
-
 export const uploadBlog = async (c : Context) => {
     
     const prisma : PrismaClient = c.get("prisma")
     const userId : string = c.get("userId") 
+    const payload : CratePostType = await c.req.json()
+    
+    const {success} = CreatePostZodShema.safeParse(payload)
 
-
-    const payload : UploadPost= await c.req.json()
+    if (!success) {
+		c.status(400);
+		return c.json({ error: "invalid input" });
+	}
 
     try {
 
@@ -108,27 +107,21 @@ export const uploadBlog = async (c : Context) => {
     } catch (error) {
         
         console.log(error);
-        return c.json({success:false,message:"Error while uploading the post"})   
+        return c.json({success:false,message:"Error while uploading the post"},500)   
     }
-}
-
-
-interface UpdatePost {
-    title?: string,
-    content?: string,
-    published ? : boolean
 }
 
 export const updateBlog = async (c : Context) => {
     
     const prisma : PrismaClient = c.get("prisma")
     const userId : string = c.get("userId")
-    
-    let payload : UpdatePost;
-    try {
-        payload = await c.req.json()
-    } catch (error) {
-        return c.json({success:false,messsage:"Please provide blog inputs"},400)
+    const payload : UpdatePostType = await c.req.json()
+
+    const {success} = UpdatePostZodShema.safeParse(payload)
+
+    if (!success) {
+        c.status(400);
+        return c.json({ error: "Please provide blog inputs" });
     }
 
     const blogId : string | undefined = await c.req.query().blogId
@@ -138,22 +131,31 @@ export const updateBlog = async (c : Context) => {
     }
 
     
-    const updatedPost = await prisma.post.update({
-        where:{
-            id: blogId
-        },
+    try {
+        const updatedPost = await prisma.post.update({
+            where:{
+                id: blogId
+            },
+    
+            data:{
+                authorId: userId,
+                title:  payload.title,
+                content: payload.content,
+                published: payload.published
+            },
+            select:{
+                id:true,
+            }
+        })
 
-        data:{
-            authorId: userId,
-            title:  payload.title,
-            content: payload.content,
-            published: payload.published
-        },
-        select:{
-            id:true,
-        }
-    })
+        return c.json({success:true, data:{postId : updatedPost}},200)
+
+    } catch (error) {
+
+        console.log(error);
+        return c.json({success:false,message:"Error while updating the post"},500)
+    }
 
     
-    return c.json({success:true, data:{postId : updatedPost}},200)
+    
 }
