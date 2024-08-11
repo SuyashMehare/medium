@@ -1,7 +1,12 @@
 import React from "react";
-
+import { BlogCard } from "../comonents/BlogCard";
+import { AppBar } from "../comonents/AppBar";
 export function Blog(){
     return <>
-        Blog
+        <AppBar/>
+        <BlogCard/>
+        <BlogCard/>
+        <BlogCard/>
+        <BlogCard/>
     </>
 }
