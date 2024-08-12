@@ -1,12 +1,12 @@
 import zod from "zod";
 
-export const SignInInputZodShema = zod.object({
+export const SignUpInputZodShema = zod.object({
     email: zod.string().email(),
     name: zod.string(),
     password: zod.string()
 })
 
-export const SignUpInputZodShema = zod.object({
+export const SignInInputZodShema = zod.object({
     email: zod.string().email(),
     password: zod.string()
 })
