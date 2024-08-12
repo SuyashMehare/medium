@@ -63,6 +63,14 @@ export const signup = async(c : Context) => {
       })
 
     
+      if(user.id){
+        return c.json({
+          success: false,
+          status:409,
+          message:"User already exist"
+        })
+      }
+
       const token = await sign({userId:user.id},c.env.JWT_SECRET)
       
 
@@ -70,9 +78,10 @@ export const signup = async(c : Context) => {
         jwt:token
       })
     } catch (error) {
-      console.log('err');
+      console.log(error);
       
         return c.json({
+          success: false,
           status:403,
           message:"Error while sign up user"
         })

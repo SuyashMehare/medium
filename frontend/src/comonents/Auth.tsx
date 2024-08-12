@@ -1,4 +1,4 @@
-import { SigninInput, SignupInput } from "@100xdevs/medium-common";
+import { SignInType, SignUpType } from "medium-request-validator";
 import axios from "axios";
 import { ChangeEvent,  useState } from "react";
 
@@ -6,19 +6,19 @@ import { Link, useNavigate } from "react-router-dom";
 
 
 type authType = "signup" | "signin";
-type genricType = SignupInput | SigninInput;
+type genricType = SignUpType | SignInType;
 
-function getSignUpInput(): SignupInput{
+function getSignUpInput(): SignUpType{
     return {
         name:"",
-        username:"",
+        email:"",
         password:""
     }
 }
 
-function getSigninInput(): SigninInput{
-    return {
-        username:"",
+function getSigninInput(): SignInType{
+    return{
+        email:"",
         password:""
     }
 }
@@ -35,11 +35,19 @@ export function Auth({type} : {type:authType}){
     async function sendAuthnputs(){
         
         const to = type === "signup" ? "signup" : "signin"
-        const urlString = `http://localhost:3000/${to}`
+        const urlString = `https://backend.suyash-mehare01.workers.dev/api/v1/user/${to}`
             
         try {
+            
             const res = await axios.post(urlString,formInputs)
-            const jwt = res.data
+            const data = res.data
+
+            if(!data.success){
+                console.log(data.message);
+                return 
+            }
+
+            const jwt = await data.jwt;
             localStorage.setItem("jwt",jwt);
             navigate('/blog')
 
@@ -71,9 +79,7 @@ export function Auth({type} : {type:authType}){
                         onchange={(e) => {
                             setFromInputs({
                                 ...formInputs,
-                                name : e.target.value,
-                                username: e.target.value,
-                                password:e.target.value
+                                name : e.target.value
                             })
                     }}/>: null
                     }
@@ -82,17 +88,13 @@ export function Auth({type} : {type:authType}){
                         onchange={(e) => {
                             setFromInputs({
                                 ...formInputs,
-                                name : e.target.value,
-                                username: e.target.value,
-                                password:e.target.value
+                                email: e.target.value
                             })
                     }}/>
                     <CreateInput label="Password" placeHolder="Enter password" type="password"
                         onchange={(e) => {
                             setFromInputs({
                                 ...formInputs,
-                                name : e.target.value,
-                                username: e.target.value,
                                 password:e.target.value
                             })
                     }}/>

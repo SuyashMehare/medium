@@ -1,6 +1,3 @@
-import React from "react";
-import { BlogCard } from "../comonents/BlogCard";
-import { AppBar } from "../comonents/AppBar";
 import { useState, useEffect } from 'react';
 import axios from "axios";
 
@@ -18,8 +15,7 @@ export function useFetchBlogs() {
                 Authorization: localStorage.getItem("jwt")
             }
         })
-        // console.log();
-        
+
         setBlogs(res.data);
         setLoading(false)
     }
@@ -33,23 +29,4 @@ export function useFetchBlogs() {
         loading
     ]
     
-}
-
-
-
-export function Blog(){
-
-    const[blogs,loading] = useFetchBlogs()
-    
-    console.log(loading);
-    
-    console.log(blogs);
-    
-    return <>
-        <AppBar/>
-        <BlogCard/>
-        <BlogCard/>
-        <BlogCard/>
-        <BlogCard/>
-    </>
 }
