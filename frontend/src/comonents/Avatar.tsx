@@ -11,7 +11,7 @@ export const Avatar = ({name, size} : {name:string,size:Size}) => {
     return (
         <div>
             <div className={`relative inline-flex items-center justify-center ${_size} overflow-hidden bg-gray-300 rounded-full dark:bg-gray-900`}>
-                <span className="font-medium text-gray-600 dark:text-gray-300">{name[0]}</span>
+                <span className="font-medium text-gray-600 dark:text-gray-300">{name[0].toUpperCase()}</span>
             </div>
         </div>
     )

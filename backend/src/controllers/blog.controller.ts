@@ -11,6 +11,7 @@ export const getAllBlogs = async (c : Context) => {
     try {
         const posts = await prisma.post.findMany({
             select:{
+                id:true,
                 title:true,
                 content:true,
                 author:{
@@ -28,7 +29,7 @@ export const getAllBlogs = async (c : Context) => {
         return c.json({success:true, data:{posts}, userId: c.get('userId')},200)
     } catch (error) {
         console.log(error);
-        return c.json({success:true, message:"Cant fetch" },500)
+        return c.json({success:false, message:"Cant fetch" },500)
     }
 }
 

@@ -4,7 +4,7 @@ import { Bindings, variables } from './utils/types'
 import blogGroup from './groups/blog.group'
 import userGroup from './groups/user.group'
 import { authMiddleware } from './middlewares/auth.middleware'
-import { corsOptions } from './middlewares/corsopt.middleware'
+import { corsOptions } from './middlewares/corsOpt.middleware'
 
 
 const app = new Hono<{

@@ -41,15 +41,15 @@ export function Auth({type} : {type:authType}){
             
             const res = await axios.post(urlString,formInputs)
             const data = res.data
+           
+            // if(!data.success){
+            //     console.log(data.message);
+            //     return 
+            // }
 
-            if(!data.success){
-                console.log(data.message);
-                return 
-            }
-
-            const jwt = await data.jwt;
+            const {jwt} = data;          
             localStorage.setItem("jwt",jwt);
-            navigate('/blog')
+            navigate('/blog/bulk')
 
         } catch (error) {
             console.log("Error while posting data....",error);

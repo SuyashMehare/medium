@@ -75,6 +75,7 @@ export const signup = async(c : Context) => {
       
 
       return c.json({
+        success:true,
         jwt:token
       })
     } catch (error) {
